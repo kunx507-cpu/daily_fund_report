@@ -102,7 +102,7 @@ def build_ai_summary(basic_report):
         timeout=60,
     )
     response.raise_for_status()
-    data = response.json()
+    data = json.loads(response.content.decode("utf-8"))
     return data["choices"][0]["message"]["content"].strip()
 
 
