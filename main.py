@@ -106,14 +106,26 @@ def build_ai_summary(basic_report):
     return data["choices"][0]["message"]["content"].strip()
 
 
+def truncate_utf8(text, max_bytes=3600):
+    encoded = text.encode("utf-8")
+    if len(encoded) <= max_bytes:
+        return text
+
+    suffix = "\n\n...(内容过长，已自动截断)"
+    limit = max_bytes - len(suffix.encode("utf-8"))
+    return encoded[:limit].decode("utf-8", errors="ignore") + suffix
+
+
 def send_wechat(content):
     webhook = get_env("WECHAT_WEBHOOK_URL")
     if not webhook:
         raise RuntimeError("WECHAT_WEBHOOK_URL is not configured")
 
+    safe_content = truncate_utf8(content)
+
     payload = {
         "msgtype": "markdown",
-        "markdown": {"content": content[:3900]},
+        "markdown": {"content": safe_content},
     }
     response = requests.post(webhook, json=payload, timeout=15)
     response.raise_for_status()
