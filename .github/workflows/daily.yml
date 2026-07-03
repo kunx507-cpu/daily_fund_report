@@ -1,0 +1,31 @@
+name: 每日基金净值日报
+
+on:
+  workflow_dispatch:
+  schedule:
+    # 北京时间工作日 14:30，UTC 时间 06:30
+    - cron: "30 6 * * 1-5"
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 设置 Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: 安装依赖
+        run: pip install -r requirements.txt
+
+      - name: 生成并推送基金日报
+        env:
+          FUND_LIST: ${{ secrets.FUND_LIST }}
+          WECHAT_WEBHOOK_URL: ${{ secrets.WECHAT_WEBHOOK_URL }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_BASE_URL: ${{ secrets.OPENAI_BASE_URL }}
+          OPENAI_MODEL: ${{ secrets.OPENAI_MODEL }}
+        run: python main.py
