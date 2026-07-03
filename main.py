@@ -82,17 +82,20 @@ def build_ai_summary(basic_report):
         "重点说明每只基金今天估算涨跌、可能的短期风险、明日观察重点；"
         "最后给出一个保守的操作倾向，只能在“偏加仓 / 观望 / 偏减仓”三者里选，"
         "并解释理由。这个倾向必须写成辅助判断，不要写成确定性投资建议。"
-        "如果数据不足，优先给“观望”。\n\n"
+        "如果数据不足，优先给“观望”。"
+        "输出要简洁，总字数控制在 500 字以内；"
+        "每只基金最多一句话；最后只给一个总体操作倾向和理由。\n\n"
         f"{basic_report}"
     )
 
     payload = {
         "model": model,
         "messages": [
-            {"role": "system", "content": "你是严谨的基金日报分析助手。"},
+            {"role": "system", "content": "你是严谨的基金日报分析助手，回答必须简洁"},
             {"role": "user", "content": prompt},
         ],
         "temperature": 0.3,
+        "max_tokens": 700,
     }
 
     response = requests.post(
